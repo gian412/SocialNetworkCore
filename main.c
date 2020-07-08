@@ -474,12 +474,12 @@ void treeEntInsert( TreeEntPtr EntRoot, unsigned short key, char nome[] ){
             
         }
         
-        newNode->pPtr = prevNode; //Salvo il riferimento al padre del nuovo nodo
-        if( prevNode == NULL ){ //Se l'albero è vuoto...
-            EntRoot = newNode; //...il nuovo nodo diventa la radice...
+        newNode->pPtr = prevNode; // Save reference to new node's father
+        if( prevNode == NULL ){ // If tree is empty...
+            EntRoot = newNode; //... new node becomes the new radix...
         }else {
             res = strcmp( newNode->idEnt, prevNode->idEnt );
-            if( res < 0 ){ //altrimenti scelgo il lato corretto
+            if( res < 0 ){ // otherwise choose correct tree side
                 prevNode->leftPtr = newNode;
             }else{
                 prevNode->rightPtr = newNode;
@@ -492,7 +492,7 @@ void treeEntInsert( TreeEntPtr EntRoot, unsigned short key, char nome[] ){
 
 
 
-//Elimino un nodo dall'albero usando le funzioni di appoggio treeSuccessor e treeMinimum
+// Delete a node from the tree using helping functions treeSuccessor and treeMinimum
 void treeEntDelete(TreeEntPtr *EntRoot, TreeEntPtr treeNode){
     
     TreeEntPtr eliminaNodo;
@@ -538,7 +538,7 @@ void sistemaInterazioni( ListaInterPtr interazioniOrig[], ListaInterPtr interazi
     ListaInterPtr interDestNode;
     for(int i=0;i<HASH_DIMENSION;i++){
         
-        //Sistemo le interazioni origine
+        // Fix otigin iterations
         interOrigNode = interazioniOrig[i];
         while( interOrigNode!=NULL ){
             (interOrigNode->otherInter)->altraEntNode = entNode;
@@ -548,7 +548,7 @@ void sistemaInterazioni( ListaInterPtr interazioniOrig[], ListaInterPtr interazi
             interOrigNode = interOrigNode->nextPtr;
         }
         
-        //Sistemo le interazioni destinazione
+        // Fix destination iterations
         interDestNode = interazioniDest[i];
         while( interDestNode!=NULL ){
             (interDestNode->otherInter)->altraEntNode = entNode;
@@ -564,7 +564,7 @@ void sistemaInterazioni( ListaInterPtr interazioniOrig[], ListaInterPtr interazi
 
 
 
-//Trova  il successore del nodo dato
+// Find node successor
 TreeEntPtr treeEntSuccessor(TreeEntPtr treeNode){
     
     TreeEntPtr yNode;
@@ -585,7 +585,7 @@ TreeEntPtr treeEntSuccessor(TreeEntPtr treeNode){
 
 
 
-//Trova il minimo nell'albero che ha come raadice il nodo passato
+// Find minimum in the tree that have the given node as radix
 TreeEnt* treeEntMinimum(TreeEntPtr treeNode){
     while( treeNode->leftPtr != NULL ){
         treeNode = treeNode->leftPtr;
@@ -596,7 +596,7 @@ TreeEnt* treeEntMinimum(TreeEntPtr treeNode){
 
 
 
-//Cerca e restituisce un nodo sapendo l'idEnt
+// Find and return a node knowing idEnt
 TreeEntPtr treeEntSearch( TreeEntPtr node, char idEnt[] ){
     
     if( node == NULL ){
@@ -617,7 +617,7 @@ TreeEntPtr treeEntSearch( TreeEntPtr node, char idEnt[] ){
 
 
 
-//Controlla se esiste già l'interazione. Se esiste restituisce 1, altrimenti 0 e la aggiunge
+// Check if the relationship already exists. If it exists return 1, otherwise return 0 and add it
 void listaInterInsert( TreeEntPtr destNode, ListaContPtr *contRoot, TreeEntPtr altraEnt, unsigned short rel ){
     ListaInterPtr prevPtr;
     ListaInterPtr currPtr;
@@ -642,7 +642,7 @@ void listaInterInsert( TreeEntPtr destNode, ListaContPtr *contRoot, TreeEntPtr a
         
             ListaContPtr contNode;
             ListaInterPtr altraInter;
-            //Inizializzo il nuovo nodo
+            // Initialize new node
             newNode->rel = rel;
             newNode->dest = true;
             newNode->prevPtr = NULL;
@@ -660,9 +660,7 @@ void listaInterInsert( TreeEntPtr destNode, ListaContPtr *contRoot, TreeEntPtr a
             newNode->cont = contNode;
             
             altraInter = listaInterAdd( &altraEnt->interazioniOrig[ (destNode->idEnt[0]) % HASH_DIMENSION ], newNode, contNode, destNode, rel );
-            /*if( (altraEnt->interazioni)->nextPtr!=NULL ){
-                ((altraEnt->interazioni)->nextPtr)->prevPtr = (altraEnt->interazioni);
-                }*/
+            
             newNode->otherInter = altraInter;
         }
     }
@@ -671,13 +669,13 @@ void listaInterInsert( TreeEntPtr destNode, ListaContPtr *contRoot, TreeEntPtr a
 
 
 
-//Aggiunge un istanza di relazione
+// Add an istance of the relationship
 ListaInterPtr listaInterAdd( ListaInterPtr *interRoot, ListaInterPtr altraInter, ListaContPtr contNode, TreeEntPtr altraEnt, unsigned short rel ){
     ListaInterPtr newNode;
     newNode = malloc( sizeof(ListaInter) );
     if( newNode!=NULL ){
         
-        //Inizializzo il nuovo nodo
+        // Initialize new node
         newNode->rel = rel;
         newNode->dest = false;
         newNode->prevPtr = NULL;
@@ -712,7 +710,7 @@ void listaInterCrea( TreeEntPtr destNode, ListaContPtr *contNode, TreeEntPtr ori
             ListaInterPtr newInterOrig;
             newInterOrig = malloc( sizeof( ListaInter ) );
             if( newInterOrig!=NULL ){
-                //Inizializzo e attacco il contatore
+                // Initialize and attach counter
                 newCont->contatore_rel = 1;
                 newCont->destNode = destNode;
                 newCont->prevPtr = NULL;
@@ -725,7 +723,7 @@ void listaInterCrea( TreeEntPtr destNode, ListaContPtr *contNode, TreeEntPtr ori
                 
                 *contNode = newCont;
                 
-                //Inizializzo e attacco l'interazione per il destinatario
+                // Initialize and attach the the relationship for addressee
                 short init = (origNode->idEnt[0]) % HASH_DIMENSION;
                 newInterDest->altraEntNode = origNode;
                 newInterDest->cont = newCont;
@@ -741,7 +739,7 @@ void listaInterCrea( TreeEntPtr destNode, ListaContPtr *contNode, TreeEntPtr ori
                 newInterDest->otherInter = newInterOrig;
                 destNode->interazioniDest[init] = newInterDest;
                 
-                //Inizializzo e attacco l'interazione per l'origine
+                // Initialize and attach the relationship for the origin
                 init = (destNode->idEnt[0]) % HASH_DIMENSION;
                 newInterOrig->altraEntNode = destNode;
                 newInterOrig->cont = newCont;
@@ -766,7 +764,7 @@ void listaInterCrea( TreeEntPtr destNode, ListaContPtr *contNode, TreeEntPtr ori
 
 
 
-//Controllo se esiste già l'interazione. Se esiste la elimina, decrementa (o elimina) il contatore ed elimina l'interazione per l'altra entità
+// Check if the relationship already exists. If it exists, delete it, decrement (or delete) the counter and delete the iteration for the other entity
 void listaInterDelete( TreeEntPtr destNode, TreeEntPtr origNode, ListaRelPtr relNode ){
     ListaInterPtr prevPtr;
     ListaInterPtr currPtr;
@@ -782,15 +780,15 @@ void listaInterDelete( TreeEntPtr destNode, TreeEntPtr origNode, ListaRelPtr rel
     }
     if( currPtr != NULL ){
         
-        //Elimino il blocco
-        if( (prevPtr==NULL) && (currPtr->nextPtr==NULL) ){//Radice e NULL finale
+        // Delete the block
+        if( (prevPtr==NULL) && (currPtr->nextPtr==NULL) ){ // Radix and final NULL
             destNode->interazioniDest[ (origNode->idEnt[0]) % HASH_DIMENSION ] = NULL;
-        }else if( (prevPtr==NULL) && (currPtr->nextPtr!=NULL) ){//Radice
+        }else if( (prevPtr==NULL) && (currPtr->nextPtr!=NULL) ){ // Radix
             destNode->interazioniDest[ (origNode->idEnt[0]) % HASH_DIMENSION ] = currPtr->nextPtr;
             (currPtr->nextPtr)->prevPtr = NULL;
-        }else if( (prevPtr!=NULL) && (currPtr->nextPtr==NULL) ){//NULL finale
+        }else if( (prevPtr!=NULL) && (currPtr->nextPtr==NULL) ){ // Final NULL
             prevPtr->nextPtr = NULL;
-        }else{//Centrale
+        }else{ // Center
             ListaInterPtr currNextPtr;
             currNextPtr = currPtr->nextPtr;
             currNextPtr->prevPtr = prevPtr;
@@ -809,15 +807,15 @@ void listaInterDelete( TreeEntPtr destNode, TreeEntPtr origNode, ListaRelPtr rel
 void altraInterDelete(ListaInterPtr *interRoot, ListaInterPtr interNode ){
     ListaInterPtr prevPtr;
     prevPtr = interNode->prevPtr;
-    //Elimino il blocco
-    if( (prevPtr==NULL) && (interNode->nextPtr==NULL) ){//Radice e NULL finale
+    // Delete the block
+    if( (prevPtr==NULL) && (interNode->nextPtr==NULL) ){ // Radix and fianl NULL
         *interRoot = NULL;
-    }else if( (prevPtr==NULL) && (interNode->nextPtr!=NULL) ){//Radice
+    }else if( (prevPtr==NULL) && (interNode->nextPtr!=NULL) ){// Radix
         *interRoot = interNode->nextPtr;
         (interNode->nextPtr)->prevPtr = NULL;
-    }else if( (prevPtr!=NULL) && (interNode->nextPtr==NULL) ){//NULL finale
+    }else if( (prevPtr!=NULL) && (interNode->nextPtr==NULL) ){// Final NULL
         prevPtr->nextPtr = NULL;
-    }else{//Centrale
+    }else{ // Center
         ListaInterPtr currNextPtr;
         currNextPtr = interNode->nextPtr;
         currNextPtr->prevPtr = prevPtr;
@@ -829,7 +827,7 @@ void altraInterDelete(ListaInterPtr *interRoot, ListaInterPtr interNode ){
 
 
 
-//Scorri le relazioni dell'entità ed elimina le loro interazioni con questa entità. Ogni volta decrementa i relativi contatori.
+// Pass entity's relationship and delete its iterations with this entity. Each time delete relative counters.
 void interDelent( TreeEntPtr entNode ){
     ListaRelPtr relNode;
     ListaInterPtr interNode;
@@ -837,7 +835,7 @@ void interDelent( TreeEntPtr entNode ){
     for( short i=0;i<HASH_DIMENSION;i++ ){
         interNode = entNode->interazioniDest[i];
         
-        //Scorro la lista delle interazioniDest e chiamo le relative funzioni di appoggio
+        // Pass destination entity's iterations and call relative helping functions
         while( interNode!=NULL ){
             relNode = relRoot;
             while ( relNode!=NULL ){
@@ -892,7 +890,7 @@ void interDelent( TreeEntPtr entNode ){
     for( short i=0;i<HASH_DIMENSION;i++ ){
         interNode = entNode->interazioniOrig[i];
 
-        //Scorro la lista delle interazioniOrig e chiamo le relative funzioni di appoggio
+        // Pass origin entity's relationship and call relative helpimg functions
         while( interNode!=NULL ){
             relNode = relRoot;
             while ( relNode!=NULL ){
@@ -940,25 +938,25 @@ void interDelent( TreeEntPtr entNode ){
 
 
 
-//Elimina l'interazione dell'altra entità per delent
+// Delete relationship for other entity of delEnt
 ListaInterPtr altraEntInterDelete(ListaInterPtr interNode ){
     ListaInterPtr prevPtr = interNode->prevPtr;
     ListaInterPtr currPtr = interNode;
     
-    //Elimino il blocco
-    if( (prevPtr==NULL) && (currPtr->nextPtr==NULL) ){//Radice e NULL finale
+    // Delete the block
+    if( (prevPtr==NULL) && (currPtr->nextPtr==NULL) ){// Radix and final NULL
         free(currPtr);
         return NULL;
-    }else if( (prevPtr==NULL) && (currPtr->nextPtr!=NULL) ){//Radice
+    }else if( (prevPtr==NULL) && (currPtr->nextPtr!=NULL) ){// Radix
         (currPtr->nextPtr)->prevPtr = NULL;
         prevPtr = currPtr->nextPtr;
         free(currPtr);
         return prevPtr;
-    }else if( (prevPtr!=NULL) && (currPtr->nextPtr==NULL) ){//NULL finale
+    }else if( (prevPtr!=NULL) && (currPtr->nextPtr==NULL) ){// Final NULL
         prevPtr->nextPtr = NULL;
         free(currPtr);
         return NULL;
-    }else{//Centrale
+    }else{ // Center
         ListaInterPtr currNextPtr;
         currNextPtr = currPtr->nextPtr;
         currNextPtr->prevPtr = prevPtr;
@@ -972,7 +970,7 @@ ListaInterPtr altraEntInterDelete(ListaInterPtr interNode ){
 
 
 
-//Fa come Hulk in Endgame
+// Do like Hulk in Endgame
 void ripristinaSnap(void){
     ListaRelPtr relNode;
     relNode = relRoot;
@@ -985,7 +983,7 @@ void ripristinaSnap(void){
 
 
 
-//Inserisci una relazione
+// Add a new relationship
 ListaRelPtr listaRelInsert( char rel[] ){
     ListaRelPtr newNode;
     
@@ -1003,7 +1001,7 @@ ListaRelPtr listaRelInsert( char rel[] ){
         prevPtr = NULL;
         currPtr = relRoot;
         int res;
-        while( (currPtr!=NULL) ){//Scorri per l'ordine alfabetico
+        while( (currPtr!=NULL) ){ // Pass to find alphabetic order
             res = strcmp(currPtr->relazione, rel);
             if(res<0){
                 prevPtr = currPtr;
@@ -1045,7 +1043,7 @@ ListaRelPtr listaRelInsert( char rel[] ){
 
 
 
-//Incrementa (o inizializza) il contatore per il destinatario
+// Increment (or initialize) the counter for the addressee
 ListaContPtr listaContInsert( ListaContPtr *contRoot, TreeEntPtr entNode ){
     if( (*contRoot) == NULL ){
         ListaContPtr newNode;
@@ -1072,7 +1070,7 @@ ListaContPtr listaContInsert( ListaContPtr *contRoot, TreeEntPtr entNode ){
             
             if( newNode!=NULL ){
                 
-                //Inizializzo il nuovo nodo
+                // Initialize new node
                 newNode->contatore_rel = 1;
                 newNode->destNode = entNode;
                 newNode->prevPtr = NULL;
@@ -1138,7 +1136,7 @@ ListaContPtr listaContInsert( ListaContPtr *contRoot, TreeEntPtr entNode ){
 
 
 
-//Decrementa (o elimina) il contatore per il destinatario
+// Decrement (or delete) the counter for addressee
 void listaContDelete( ListaContPtr *contRoot, unsigned short dest ){
     if( (*contRoot) != NULL ){
         ListaContPtr prevPtr;
@@ -1153,15 +1151,15 @@ void listaContDelete( ListaContPtr *contRoot, unsigned short dest ){
             currPtr->contatore_rel--;
             if( currPtr->contatore_rel == 0 ){
                 
-                //Elimino il blocco
-                if( (prevPtr==NULL) && (currPtr->nextPtr==NULL) ){//Radice e NULL finale
+                // Delete the block
+                if( (prevPtr==NULL) && (currPtr->nextPtr==NULL) ){ // Radix and final NULL
                     *contRoot = NULL;
-                }else if( (prevPtr==NULL) && (currPtr->nextPtr!=NULL) ){//Radice
+                }else if( (prevPtr==NULL) && (currPtr->nextPtr!=NULL) ){ // Radix
                     *contRoot = currPtr->nextPtr;
                     (currPtr->nextPtr)->prevPtr = NULL;
-                }else if( (prevPtr!=NULL) && (currPtr->nextPtr==NULL) ){//NULL finale
+                }else if( (prevPtr!=NULL) && (currPtr->nextPtr==NULL) ){ // Final NULL
                     prevPtr->nextPtr = NULL;
-                }else{//Centrale
+                }else{ // Center
                     ListaContPtr currNextPtr;
                     currNextPtr = currPtr->nextPtr;
                     currNextPtr->prevPtr = prevPtr;
@@ -1196,15 +1194,15 @@ void listaContDecrementa( ListaContPtr *contRoot, ListaContPtr contNode ){
     if( contNode->contatore_rel==1 ){
         ListaContPtr prevPtr;
         prevPtr = contNode->prevPtr;
-        //Elimino il blocco
-        if( (prevPtr==NULL) && (contNode->nextPtr==NULL) ){//Radice e NULL finale
+        // Delete the block
+        if( (prevPtr==NULL) && (contNode->nextPtr==NULL) ){ // Radix and final NULL
             *contRoot = NULL;
-        }else if( (prevPtr==NULL) && (contNode->nextPtr!=NULL) ){//Radice
+        }else if( (prevPtr==NULL) && (contNode->nextPtr!=NULL) ){ // Radix
             *contRoot = contNode->nextPtr;
             (contNode->nextPtr)->prevPtr = NULL;
-        }else if( (prevPtr!=NULL) && (contNode->nextPtr==NULL) ){//NULL finale
+        }else if( (prevPtr!=NULL) && (contNode->nextPtr==NULL) ){ // Final NULL
             prevPtr->nextPtr = NULL;
-        }else{//Centrale
+        }else{ // Center
             ListaContPtr currNextPtr;
             currNextPtr = contNode->nextPtr;
             currNextPtr->prevPtr = prevPtr;
@@ -1238,15 +1236,15 @@ void listaContSnap(ListaContPtr *contRoot, ListaContPtr contNode ){
     ListaContPtr currPtr;
     prevPtr = contNode->prevPtr;
     currPtr = contNode;
-    //Elimino il blocco
-    if( (prevPtr==NULL) && (currPtr->nextPtr==NULL) ){//Radice e NULL finale
+    // Delete the block
+    if( (prevPtr==NULL) && (currPtr->nextPtr==NULL) ){// Radix and final NULL
         *contRoot = NULL;
-    }else if( (prevPtr==NULL) && (currPtr->nextPtr!=NULL) ){//Radice
+    }else if( (prevPtr==NULL) && (currPtr->nextPtr!=NULL) ){ // Radix
         *contRoot = currPtr->nextPtr;
         (currPtr->nextPtr)->prevPtr = NULL;
-    }else if( (prevPtr!=NULL) && (currPtr->nextPtr==NULL) ){//NULL finale
+    }else if( (prevPtr!=NULL) && (currPtr->nextPtr==NULL) ){ // Final NULL
         prevPtr->nextPtr = NULL;
-    }else{//Centrale
+    }else{ // Center
         ListaContPtr currNextPtr;
         currNextPtr = currPtr->nextPtr;
         currNextPtr->prevPtr = prevPtr;
@@ -1259,7 +1257,7 @@ void listaContSnap(ListaContPtr *contRoot, ListaContPtr contNode ){
 
 
 
-//Cerca se esiste già il tipo di relazione. Se esiste lo ritorna, altrimenti ritorna NULL
+// heck if the relationship already exists. If it exists, return it, otherwise return NULL
 ListaRelPtr listaRelSearch ( char rel[] ){
     if( relRoot==NULL || strcmp( relRoot->relazione, rel)==0 ){
         return relRoot;
@@ -1286,22 +1284,22 @@ ListaRelPtr listaRelSearch ( char rel[] ){
 
 
 
-//Elimino un tipo di relazione se non ha più contatori
+// Delete the relationship type
 bool listaRelDelete( ListaRelPtr relNode ){
     if( relNode->contatori==NULL ){
         ListaRelPtr prevPtr;
         ListaRelPtr currPtr;
         prevPtr = relNode->prevPtr;
         currPtr = relNode;
-        //Elimino il blocco
-        if( (prevPtr==NULL) && (currPtr->nextPtr==NULL) ){//Radice e NULL finale
+        // Delete the block
+        if( (prevPtr==NULL) && (currPtr->nextPtr==NULL) ){ // Radix and final NULL
             relRoot = NULL;
-        }else if( (prevPtr==NULL) && (currPtr->nextPtr!=NULL) ){//Radice
+        }else if( (prevPtr==NULL) && (currPtr->nextPtr!=NULL) ){ // Radix
             relRoot = currPtr->nextPtr;
             (currPtr->nextPtr)->prevPtr = NULL;
-        }else if( (prevPtr!=NULL) && (currPtr->nextPtr==NULL) ){//NULL finale
+        }else if( (prevPtr!=NULL) && (currPtr->nextPtr==NULL) ){ // Final NULL
             prevPtr->nextPtr = NULL;
-        }else{//Centrale
+        }else{ // Center
             ListaRelPtr currNextPtr;
             currNextPtr = currPtr->nextPtr;
             currNextPtr->prevPtr = prevPtr;
@@ -1318,15 +1316,15 @@ bool listaRelDelete( ListaRelPtr relNode ){
 
 
 
-//Scambia i due nodi
+// Swap two nodes
 ListaContPtr swap(ListaContPtr primoPtr, ListaContPtr secondoPtr ){
-    if( ((primoPtr->prevPtr == NULL) && (secondoPtr->nextPtr == NULL)) ){//Radice e NULL finale
+    if( ((primoPtr->prevPtr == NULL) && (secondoPtr->nextPtr == NULL)) ){ // Radix and final NULL
         secondoPtr->prevPtr = NULL;
         secondoPtr->nextPtr = primoPtr;
         primoPtr->prevPtr = secondoPtr;
         primoPtr->nextPtr = NULL;
         return secondoPtr;
-    }else if( ((primoPtr->prevPtr == NULL) && (secondoPtr)->nextPtr != NULL) ){//Radice
+    }else if( ((primoPtr->prevPtr == NULL) && (secondoPtr)->nextPtr != NULL) ){ // Radix
         ListaContPtr secondoNextPtr;
         secondoNextPtr = secondoPtr->nextPtr;
         
@@ -1336,7 +1334,7 @@ ListaContPtr swap(ListaContPtr primoPtr, ListaContPtr secondoPtr ){
         primoPtr->nextPtr = secondoNextPtr;
         secondoNextPtr->prevPtr = primoPtr;
         return secondoPtr;
-    }else if( ((primoPtr->prevPtr != NULL) && (secondoPtr->nextPtr == NULL)) ){//NULL finale
+    }else if( ((primoPtr->prevPtr != NULL) && (secondoPtr->nextPtr == NULL)) ){ // Final NULL
         ListaContPtr primoPrevPtr;
         primoPrevPtr = primoPtr->prevPtr;
         
@@ -1346,7 +1344,7 @@ ListaContPtr swap(ListaContPtr primoPtr, ListaContPtr secondoPtr ){
         primoPtr->prevPtr = secondoPtr;
         primoPtr->nextPtr = NULL;
         return NULL;
-    }else{//Centrale
+    }else{ // Center
         ListaContPtr primoPrevPtr;
         ListaContPtr secondoNextPtr;
         primoPrevPtr = primoPtr->prevPtr;
